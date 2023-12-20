@@ -1,0 +1,64 @@
+package lab6;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class GUI extends JFrame implements ActionListener{
+	
+	private JButton loadBtn, saveBtn, searchBtn, nextBtn, addBtn, deleteBtn;
+	
+	public GUI() {
+		
+		//JFrame frame = new JFrame("Interactive phone book");
+		setTitle("Interactive phone book");
+		
+		Font theFont = new Font("SansSerif", Font.PLAIN, 20);
+		Container c = getContentPane();
+		
+		c.setLayout(new GridLayout(3,3));
+		setVisible(true);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		JButton loadBtn = new JButton("Load Phonebook");
+		loadBtn.setFont(theFont);
+		loadBtn.setEnabled(true);
+		loadBtn.addActionListener(this);
+		c.add(loadBtn);
+		
+		JButton saveBtn = new JButton("Save Phonebook");
+		saveBtn.setFont(theFont);
+		saveBtn.setEnabled(false);
+		c.add(saveBtn);
+		
+		JButton searchBtn = new JButton("Search");
+		searchBtn.setFont(theFont);
+		searchBtn.setEnabled(false);
+		c.add(searchBtn);
+		
+		JButton nextBtn = new JButton("Next name");
+		nextBtn.setFont(theFont);
+		nextBtn.setEnabled(false);
+		c.add(nextBtn);
+		
+		JButton addBtn = new JButton("Add person");
+		addBtn.setFont(theFont);
+		addBtn.setEnabled(false);
+		c.add(addBtn);
+		
+		JButton deleteBtn = new JButton("Delete person");
+		deleteBtn.setFont(theFont);
+		deleteBtn.setEnabled(false);
+		c.add(deleteBtn);
+		
+		pack();
+	}
+	
+	public static void main(String[] args) {
+		GUI gui = new GUI();
+		
+	}
+	
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == this) {System.out.println("Works");}
+	}
+}
