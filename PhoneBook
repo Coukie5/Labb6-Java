@@ -1,0 +1,90 @@
+package lab6;
+import java.util.ArrayList;
+import java.io.*;
+
+public class PhoneBook {
+	private ArrayList<Person> listOfNumbers;
+	
+	public PhoneBook() {
+		listOfNumbers = new ArrayList<Person>();
+	}
+	
+	public String load(String arg) {
+		
+		try {
+			File f = new File(arg);
+			
+			BufferedReader bfr = new BufferedReader(new FileReader(f));
+			
+			String Line;
+			String[] person = new String[3];
+			while((Line = bfr.readLine()) != null) {
+				//Line = Line.toLowerCase();
+				person = Line.split(" +");
+				int numb = Integer.parseInt(person[2]);
+				Person p = new Person(person[0], person[1], numb);
+				listOfNumbers.add(p);
+			}
+			bfr.close();
+		}
+		catch(IOException e){
+			return "Try again";
+		}
+		return "Phone book loaded";
+	}
+	
+	public ArrayList<Person> search(String arg){
+		ArrayList<Person> list = new ArrayList<Person>();
+		for (Person p : listOfNumbers) {
+			try {
+				if ((p.getSurname().compareTo(arg) == 0) || p.getPhoneNumber() == Integer.parseInt(arg)) {
+					list.add(p);
+				}
+			}
+			catch (NumberFormatException e){
+				
+			}
+			
+		}
+		return list;
+	}
+	
+	public String deletePerson(String arg1, int arg2) {
+		ArrayList<Person> person = search(Integer.toString(arg2));
+		if (person.get(0).getFullname().compareTo(arg1) == 0 && person.get(0).getPhoneNumber() == arg2) {
+			listOfNumbers.remove(person.get(0));
+			return "Person deleted";
+		}
+		return "The person/number does not exist";
+	}
+	
+	public boolean addPerson(String arg1, int arg2) {
+		String[] name = arg1.split(" +");
+		ArrayList<Person> person = search(Integer.toString(arg2));
+		if(name.length != 2 && !person.isEmpty()) {
+			return false;
+		}else {
+			Person p = new Person(name[0], name[1], arg2);
+			listOfNumbers.add(p);
+			return true;
+		}
+	}
+	
+	public String save(String arg) {
+		try {
+			File out = new File(arg);
+			out.createNewFile();
+			BufferedWriter w = new BufferedWriter(new FileWriter(out, false));
+			for (Person p : listOfNumbers) {
+				String s = String.format("%20s %5d\n", p.getFullname(), p.getPhoneNumber());
+				w.write(s);
+			}
+			w.close();
+			return "Saved " + listOfNumbers.size() + " people to the file";
+			
+		} catch (IOException e) {
+			return "Could not save to the file";
+		}
+		
+	}
+}
