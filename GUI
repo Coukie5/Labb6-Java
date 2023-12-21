@@ -2,10 +2,18 @@ package lab6;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class GUI extends JFrame implements ActionListener{
 	
 	private JButton loadBtn, saveBtn, searchBtn, nextBtn, addBtn, deleteBtn;
+	private JTextField searchField, nameField, numberField;
+	private static PhoneBook theBook;
+
+	public static void main(String[] args) {
+		new GUI();
+		theBook = new PhoneBook();
+	}
 	
 	public GUI() {
 		
@@ -14,51 +22,195 @@ public class GUI extends JFrame implements ActionListener{
 		
 		Font theFont = new Font("SansSerif", Font.PLAIN, 20);
 		Container c = getContentPane();
+		Container cBtn = new Container();
+		cBtn.setLayout(new GridLayout(3,2));
+		Container cField = new Container();
+		cField.setLayout(new GridLayout(3,1));
+		c.setLayout(new GridLayout(1, 2));
+		c.add(cBtn);
+		c.add(cField);
 		
-		c.setLayout(new GridLayout(3,3));
-		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		JButton loadBtn = new JButton("Load Phonebook");
+		loadBtn = new JButton("Load Phonebook");
 		loadBtn.setFont(theFont);
 		loadBtn.setEnabled(true);
 		loadBtn.addActionListener(this);
-		c.add(loadBtn);
 		
-		JButton saveBtn = new JButton("Save Phonebook");
+		
+		saveBtn = new JButton("Save Phonebook");
 		saveBtn.setFont(theFont);
 		saveBtn.setEnabled(false);
-		c.add(saveBtn);
+		saveBtn.addActionListener(this);
 		
-		JButton searchBtn = new JButton("Search");
+		
+		searchBtn = new JButton("Search");
 		searchBtn.setFont(theFont);
 		searchBtn.setEnabled(false);
-		c.add(searchBtn);
+		searchBtn.addActionListener(this);
 		
-		JButton nextBtn = new JButton("Next name");
+		
+		nextBtn = new JButton("Next name");
 		nextBtn.setFont(theFont);
 		nextBtn.setEnabled(false);
-		c.add(nextBtn);
+		nextBtn.addActionListener(this);
 		
-		JButton addBtn = new JButton("Add person");
+		
+		addBtn = new JButton("Add person");
 		addBtn.setFont(theFont);
 		addBtn.setEnabled(false);
-		c.add(addBtn);
+		addBtn.addActionListener(this);
 		
-		JButton deleteBtn = new JButton("Delete person");
+		
+		deleteBtn = new JButton("Delete person");
 		deleteBtn.setFont(theFont);
 		deleteBtn.setEnabled(false);
-		c.add(deleteBtn);
+		deleteBtn.addActionListener(this);
+		
+		
+		searchField = new JTextField(15);
+		searchField.setFont(theFont);
+		searchField.addActionListener(this);
+		
+		
+		nameField = new JTextField(15);
+		nameField.setFont(theFont);
+		nameField.setEditable(false);
+		nameField.addActionListener(this);
+		
+		
+		numberField = new JTextField(15);
+		numberField.setFont(theFont);
+		numberField.setEditable(false);
+		numberField.addActionListener(this);
+		
+		
+		cBtn.add(loadBtn);
+		cBtn.add(saveBtn);
+		cBtn.add(searchBtn);
+		cBtn.add(nextBtn);
+		cBtn.add(addBtn);
+		cBtn.add(deleteBtn);
+		
+		cField.add(searchField);
+		cField.add(nameField);
+		cField.add(numberField);
 		
 		pack();
+		setVisible(true);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
-	public static void main(String[] args) {
-		GUI gui = new GUI();
-		
-	}
+	
+	String searchText = "";
+	String nameText = "";
+	String numbText = "";
+	ArrayList<Person> pSearch = new ArrayList<Person>();
+	int pCounter = 0;
 	
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getSource() == this) {System.out.println("Works");}
+		
+		if (ae.getSource() == loadBtn || ae.getSource() == searchField) {// Load function
+			pCounter = 0;
+			searchText = searchField.getText();
+			searchField.setText("");
+			nameText = theBook.load(searchText);
+			nameField.setText(nameText);
+			if (nameText.compareTo("Phone book loaded") == 0) {
+				loadBtn.setEnabled(true);
+				saveBtn.setEnabled(true);
+				searchBtn.setEnabled(true);
+				nextBtn.setEnabled(false);
+				addBtn.setEnabled(true);
+				deleteBtn.setEnabled(true);
+			}
+		}
+		
+		if (ae.getSource() == saveBtn) {
+			pCounter = 0;
+			nextBtn.setEnabled(false);
+			nameField.setEditable(false);
+			numberField.setEditable(false);
+			searchText = searchField.getText();
+			searchField.setText("");
+			numberField.setText("");
+			if (searchText.compareTo("") == 0 || searchText.compareTo("PhoneList.txt") == 0) {
+				nameField.setText("Provide a file name");
+			}else {
+				nameText = theBook.save(searchText);
+				nameField.setText(nameText);
+			}
+		}
+		
+		
+		if (ae.getSource() == searchBtn) {
+			pCounter = 0;
+			nextBtn.setEnabled(false);
+			nameField.setEditable(false);
+			numberField.setEditable(false);
+			searchText = searchField.getText();
+			searchField.setText("");
+			pSearch = theBook.search(searchText);
+			if (pSearch.size() == 0) {
+				nameField.setText("Provide a name");
+				numberField.setText("");
+			}else if(pSearch.size() >= 1) {
+				nameField.setText(pSearch.get(0).getFullname());
+				numberField.setText(Integer.toString(pSearch.get(0).getPhoneNumber()));
+				if (pSearch.size() > 1) {
+					pCounter = 0;
+					nextBtn.setEnabled(true);
+				}
+			}
+		}
+		
+		if (ae.getSource() == nextBtn) {
+			pCounter++;
+			System.out.println(pSearch.size());
+			nameField.setText(pSearch.get(pCounter).getFullname());
+			numberField.setText(Integer.toString(pSearch.get(pCounter).getPhoneNumber()));
+			if (pCounter == pSearch.size() - 1) {
+				pCounter = 0;
+				nextBtn.setEnabled(false);
+			}
+		}
+		
+		if (ae.getSource() == deleteBtn) {
+			pCounter = 0;
+			nextBtn.setEnabled(false);
+			nameField.setEditable(false);
+			numberField.setEditable(false);
+			nameText = nameField.getText();
+			numbText = numberField.getText();
+			if (theBook.search(numbText).size() != 0) {
+				theBook.deletePerson(nameText, Integer.parseInt(numbText));
+				searchField.setText("Person deleted");
+			}else {
+				searchField.setText("Person doesn't exist");
+			}
+		}
+		
+		if (ae.getSource() == addBtn) {
+			pCounter = 0;
+			nextBtn.setEnabled(false);
+			searchText = searchField.getText();
+			if (searchText.equals("Type in name and phonenumber")) {
+				nameText = nameField.getText();
+				numbText = numberField.getText();
+				if (nameText.equals("") || numbText.equals("")) {
+					;
+				}else if (theBook.addPerson(nameText, Integer.parseInt(numbText))) {
+						searchField.setText("Person added");
+						nameField.setText("");
+						numberField.setText("");
+						nameField.setEditable(false);
+						numberField.setEditable(false);
+				}
+			}else {
+				searchField.setText("Type in name and phonenumber");
+				nameField.setText("");
+				numberField.setText("");
+				nameField.setEditable(true);
+				numberField.setEditable(true);
+			}
+		}
 	}
 }
